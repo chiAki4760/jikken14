@@ -1,0 +1,2088 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>13日の金曜日 // 血塗られたクリスタル・レイクの記録簿</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    :root {
+      --lake-deep: #050b14;
+      --lake: #0f172a;
+      --lake-mist: #1e293b;
+      --fog: #334155;
+
+      --blood: #991b1b;
+      --blood-bright: #ef4444;
+      --blood-dark: #450a0a;
+
+      --wood-dark: #1c1917;
+      --wood-border: #44403c;
+
+      --bubble: rgba(220, 38, 38, 0.35);
+
+      --text: #f1f5f9;
+      --text-soft: #94a3b8;
+
+      --success: #10b981;
+      --success-bg: #064e3b;
+
+      --danger: #ef4444;
+      --danger-bg: #450a0a;
+
+      --card: rgba(15, 23, 42, 0.95);
+      --border: rgba(153, 27, 27, 0.4);
+
+      --shadow: 0 16px 40px rgba(0, 0, 0, 0.85);
+    }
+
+    html {
+      min-height: 100%;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Hiragino Kaku Gothic ProN",
+        "Hiragino Sans",
+        "Yu Gothic",
+        "Meiryo",
+        sans-serif;
+
+      color: var(--text);
+
+      background:
+        radial-gradient(
+          circle at 15% 15%,
+          rgba(239, 68, 68, 0.08) 0 4px,
+          transparent 5px
+        ),
+        radial-gradient(
+          circle at 80% 30%,
+          rgba(255, 255, 255, 0.05) 0 3px,
+          transparent 4px
+        ),
+        linear-gradient(
+          180deg,
+          #020617 0%,
+          #0b1120 30%,
+          #111827 70%,
+          #030712 100%
+        );
+
+      padding: 18px;
+      overflow-x: hidden;
+    }
+
+    /* =========================
+       湖底の泡・血の粒子
+    ========================== */
+
+    .bubble {
+      position: fixed;
+      bottom: -80px;
+      border-radius: 50%;
+      background: rgba(185, 28, 28, 0.22);
+      border: 2px solid rgba(239, 68, 68, 0.4);
+      pointer-events: none;
+      animation: bubbleUp linear infinite;
+      z-index: 0;
+      box-shadow: 0 0 10px rgba(220, 38, 38, 0.3);
+    }
+
+    .bubble:nth-child(1) {
+      left: 6%;
+      width: 26px;
+      height: 26px;
+      animation-duration: 12s;
+    }
+
+    .bubble:nth-child(2) {
+      left: 19%;
+      width: 14px;
+      height: 14px;
+      animation-duration: 8s;
+      animation-delay: 2s;
+    }
+
+    .bubble:nth-child(3) {
+      left: 35%;
+      width: 36px;
+      height: 36px;
+      animation-duration: 15s;
+      animation-delay: 1s;
+    }
+
+    .bubble:nth-child(4) {
+      left: 54%;
+      width: 18px;
+      height: 18px;
+      animation-duration: 9s;
+      animation-delay: 3s;
+    }
+
+    .bubble:nth-child(5) {
+      left: 74%;
+      width: 30px;
+      height: 30px;
+      animation-duration: 13s;
+      animation-delay: 4s;
+    }
+
+    .bubble:nth-child(6) {
+      left: 89%;
+      width: 16px;
+      height: 16px;
+      animation-duration: 10s;
+      animation-delay: 2s;
+    }
+
+    @keyframes bubbleUp {
+      0% {
+        transform: translateY(0) translateX(0);
+        opacity: 0;
+      }
+
+      10% {
+        opacity: .75;
+      }
+
+      50% {
+        transform: translateY(-50vh) translateX(22px);
+      }
+
+      100% {
+        transform: translateY(-115vh) translateX(-20px);
+        opacity: 0;
+      }
+    }
+
+    /* =========================
+       メインコンテナ
+    ========================== */
+
+    .container {
+      position: relative;
+      z-index: 2;
+
+      width: 100%;
+      max-width: 760px;
+
+      margin: 0 auto;
+
+      background: var(--card);
+
+      border: 2px solid #334155;
+      border-radius: 24px;
+
+      padding: 22px;
+
+      box-shadow: var(--shadow), 0 0 20px rgba(153, 27, 27, 0.25);
+
+      overflow: hidden;
+    }
+
+    .container::before {
+      content: "";
+      position: absolute;
+      left: -20%;
+      right: -20%;
+      top: -65px;
+
+      height: 100px;
+
+      background: rgba(220, 38, 38, 0.08);
+
+      border-radius: 50%;
+
+      pointer-events: none;
+    }
+
+    /* =========================
+       ヘッダー
+    ========================== */
+
+    .header {
+      position: relative;
+
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+
+      padding: 6px 4px 18px;
+
+      border-bottom: 2px dashed rgba(153, 27, 27, 0.5);
+    }
+
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .island-icon {
+      width: 54px;
+      height: 54px;
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      background:
+        radial-gradient(
+          circle at 35% 30%,
+          #450a0a 0 10px,
+          transparent 11px
+        ),
+        linear-gradient(
+          160deg,
+          #7f1d1d,
+          #991b1b
+        );
+
+      border: 2px solid #ef4444;
+      border-radius: 50%;
+
+      box-shadow:
+        0 4px 0 #450a0a,
+        0 6px 15px rgba(239, 68, 68, 0.35);
+
+      font-size: 26px;
+    }
+
+    .header h1 {
+      margin: 0;
+
+      font-size: 1.1rem;
+      line-height: 1.35;
+
+      color: #f87171;
+
+      font-weight: 900;
+
+      letter-spacing: .8px;
+    }
+
+    .subtitle {
+      margin-top: 3px;
+
+      font-size: .72rem;
+      color: var(--text-soft);
+    }
+
+    .status-badge {
+      flex-shrink: 0;
+
+      padding: 7px 12px;
+
+      border-radius: 999px;
+
+      background: #064e3b;
+      color: #6ee7b7;
+
+      border: 2px solid #10b981;
+
+      font-size: .72rem;
+      font-weight: 800;
+
+      box-shadow: 0 3px 0 rgba(0, 0, 0, 0.5);
+    }
+
+    .status-badge.review {
+      background: #78350f;
+      color: #fde68a;
+      border-color: #f59e0b;
+    }
+
+    /* =========================
+       探索ゲージ
+    ========================== */
+
+    .explore-bar {
+      margin: 18px 0;
+
+      padding: 12px 14px;
+
+      background: #0b0f19;
+
+      border: 2px solid #1e293b;
+      border-radius: 18px;
+    }
+
+    .explore-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      margin-bottom: 7px;
+
+      font-size: .76rem;
+      font-weight: 800;
+      color: #cbd5e1;
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 12px;
+
+      background: #1e293b;
+
+      border-radius: 999px;
+
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      width: 0%;
+      height: 100%;
+
+      background:
+        linear-gradient(
+          90deg,
+          #991b1b,
+          #dc2626,
+          #ef4444
+        );
+
+      border-radius: 999px;
+
+      transition: width .6s ease;
+
+      box-shadow:
+        0 0 12px rgba(239, 68, 68, 0.6);
+    }
+
+    /* =========================
+       問題カード
+    ========================== */
+
+    .card {
+      position: relative;
+
+      background:
+        linear-gradient(
+          180deg,
+          rgba(15, 23, 42, 0.98),
+          rgba(11, 15, 25, 0.95)
+        );
+
+      border: 2px solid var(--border);
+
+      border-radius: 20px;
+
+      padding: 18px;
+
+      margin-bottom: 16px;
+
+      box-shadow:
+        0 5px 15px rgba(0, 0, 0, 0.6);
+    }
+
+    .card::after {
+      content: "🩸";
+
+      position: absolute;
+
+      right: 14px;
+      top: 12px;
+
+      font-size: 20px;
+
+      opacity: .6;
+    }
+
+    .question-label {
+      display: inline-block;
+
+      padding: 5px 11px;
+
+      margin-bottom: 9px;
+
+      background: #7f1d1d;
+
+      color: #fecaca;
+
+      border-radius: 999px;
+
+      font-size: .73rem;
+      font-weight: 900;
+      letter-spacing: .5px;
+    }
+
+    .story-text {
+      margin: 0;
+
+      font-size: .96rem;
+      line-height: 1.8;
+
+      font-weight: 600;
+
+      color: #f1f5f9;
+    }
+
+    /* =========================
+       案内キャラクター（案内人・不吉な警告）
+    ========================== */
+
+    .guide {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      margin: 12px 0 18px;
+
+      padding: 10px 13px;
+
+      background: #181114;
+
+      border: 2px solid #581c1c;
+
+      border-radius: 17px;
+
+      color: #fca5a5;
+
+      font-size: .78rem;
+      font-weight: 700;
+    }
+
+    .guide-face {
+      width: 40px;
+      height: 40px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      flex-shrink: 0;
+
+      background: #271418;
+
+      border: 2px solid #991b1b;
+
+      border-radius: 50%;
+
+      font-size: 22px;
+
+      animation: floatFace 2.5s ease-in-out infinite;
+    }
+
+    @keyframes floatFace {
+      0%,100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-4px);
+      }
+    }
+
+    /* =========================
+       借方（Debit）・貸方（Credit）
+    ========================== */
+
+    .split-container {
+      display: grid;
+
+      grid-template-columns: 1fr 1fr;
+
+      gap: 14px;
+
+      width: 100%;
+
+      margin-bottom: 16px;
+    }
+
+    @media (max-width: 600px) {
+      .split-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .side-column {
+      background:
+        linear-gradient(
+          180deg,
+          #0b1329,
+          #080e1e
+        );
+
+      border: 2px solid #1e3a8a;
+
+      border-radius: 18px;
+
+      padding: 13px;
+
+      transition: transform .2s ease;
+    }
+
+    .side-column:hover {
+      transform: translateY(-2px);
+    }
+
+    .side-column.credit {
+      background:
+        linear-gradient(
+          180deg,
+          #1e0e14,
+          #16080d
+        );
+
+      border-color: #881337;
+    }
+
+    .side-title {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+
+      margin-bottom: 10px;
+
+      font-size: .88rem;
+
+      color: #60a5fa;
+
+      font-weight: 900;
+    }
+
+    .credit .side-title {
+      color: #fb7185;
+    }
+
+    .entry-row {
+      display: flex;
+
+      gap: 6px;
+
+      margin-bottom: 8px;
+
+      align-items: center;
+
+      width: 100%;
+    }
+
+    .entry-row input[type="text"],
+    .entry-row input[type="number"] {
+      min-width: 0;
+
+      padding: 9px;
+
+      background: #050811;
+
+      border: 2px solid #334155;
+
+      border-radius: 10px;
+
+      color: #ffffff;
+
+      font-size: .9rem;
+
+      outline: none;
+
+      transition:
+        border-color .2s,
+        box-shadow .2s;
+    }
+
+    .entry-row input[type="text"] {
+      flex: 1.2;
+      width: 0;
+    }
+
+    .entry-row input[type="number"] {
+      flex: 1;
+      width: 0;
+    }
+
+    .entry-row input:focus {
+      border-color: #ef4444;
+
+      box-shadow:
+        0 0 0 3px rgba(239, 68, 68, 0.25);
+    }
+
+    .btn-remove {
+      background: #450a0a;
+
+      border: 2px solid #7f1d1d;
+
+      color: #fca5a5;
+
+      font-size: .82rem;
+
+      cursor: pointer;
+
+      padding: 7px 8px;
+
+      border-radius: 9px;
+
+      transition: transform .15s;
+    }
+
+    .btn-remove:hover {
+      transform: scale(1.08);
+    }
+
+    .btn-add {
+      width: 100%;
+
+      background: rgba(15, 23, 42, 0.8);
+
+      border: 2px dashed #475569;
+
+      border-radius: 11px;
+
+      padding: 7px;
+
+      font-size: .78rem;
+
+      cursor: pointer;
+
+      color: #94a3b8;
+
+      font-weight: 800;
+    }
+
+    .btn-add:hover {
+      background: #1e293b;
+      color: #f1f5f9;
+      border-color: #94a3b8;
+    }
+
+    /* =========================
+       メインボタン
+    ========================== */
+
+    .btn-submit {
+      position: relative;
+
+      width: 100%;
+
+      background:
+        linear-gradient(
+          180deg,
+          #b91c1c,
+          #7f1d1d
+        );
+
+      color: #fff;
+
+      border: 0;
+
+      border-radius: 15px;
+
+      padding: 14px;
+
+      font-size: .98rem;
+
+      font-weight: 900;
+
+      cursor: pointer;
+
+      box-shadow:
+        0 5px 0 #450a0a,
+        0 9px 18px rgba(185, 28, 28, 0.4);
+
+      transition:
+        transform .15s,
+        box-shadow .15s;
+    }
+
+    .btn-submit:hover {
+      transform: translateY(-2px);
+
+      box-shadow:
+        0 7px 0 #450a0a,
+        0 12px 22px rgba(220, 38, 38, 0.5);
+    }
+
+    .btn-submit:active {
+      transform: translateY(3px);
+
+      box-shadow:
+        0 2px 0 #450a0a;
+    }
+
+    /* =========================
+       結果表示
+    ========================== */
+
+    .result-box {
+      margin-top: 18px;
+
+      padding: 15px;
+
+      border-radius: 17px;
+
+      display: none;
+
+      font-size: .88rem;
+
+      line-height: 1.75;
+
+      animation: resultAppear .35s ease;
+    }
+
+    @keyframes resultAppear {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .result-box.correct {
+      background:
+        linear-gradient(
+          135deg,
+          #064e3b,
+          #065f46
+        );
+
+      border: 2px solid #10b981;
+
+      color: #a7f3d0;
+
+      box-shadow:
+        0 5px 18px rgba(16, 185, 129, 0.2);
+    }
+
+    .result-box.wrong {
+      background:
+        linear-gradient(
+          135deg,
+          #450a0a,
+          #581c1c
+        );
+
+      border: 2px solid #ef4444;
+
+      color: #fecaca;
+    }
+
+    /* =========================
+       ナビゲーション
+    ========================== */
+
+    .nav-buttons {
+      display: flex;
+
+      justify-content: space-between;
+
+      gap: 10px;
+
+      margin-top: 18px;
+    }
+
+    .nav-btn {
+      flex: 1;
+
+      background: #1e293b;
+
+      color: #cbd5e1;
+
+      border: 1px solid #334155;
+
+      border-radius: 12px;
+
+      padding: 10px 14px;
+
+      cursor: pointer;
+
+      font-weight: 800;
+
+      box-shadow: 0 3px 0 #0f172a;
+
+      transition: transform .15s;
+    }
+
+    .nav-btn:hover {
+      transform: translateY(-2px);
+      background: #334155;
+      color: #ffffff;
+    }
+
+    /* =========================
+       完了画面
+    ========================== */
+
+    .clear-card {
+      text-align: center;
+
+      padding: 28px 18px;
+
+      display: none;
+    }
+
+    .treasure {
+      font-size: 60px;
+
+      animation:
+        treasureFloat 2s ease-in-out infinite;
+    }
+
+    @keyframes treasureFloat {
+      0%,100% {
+        transform: translateY(0) rotate(-3deg);
+      }
+
+      50% {
+        transform: translateY(-9px) rotate(3deg);
+      }
+    }
+
+    .badge-complete {
+      display: inline-block;
+
+      background:
+        linear-gradient(
+          135deg,
+          #064e3b,
+          #047857
+        );
+
+      color: #a7f3d0;
+
+      border: 3px solid #10b981;
+
+      padding: 9px 17px;
+
+      border-radius: 9999px;
+
+      font-size: 1.02rem;
+
+      font-weight: 900;
+
+      margin: 8px 0 18px;
+
+      box-shadow:
+        0 4px 0 #064e3b;
+    }
+
+    .btn-review,
+    .btn-restart {
+      width: 100%;
+
+      border: 0;
+
+      border-radius: 14px;
+
+      padding: 13px;
+
+      font-size: .94rem;
+
+      font-weight: 900;
+
+      cursor: pointer;
+
+      margin-bottom: 10px;
+    }
+
+    .btn-review {
+      background:
+        linear-gradient(
+          180deg,
+          #c2410c,
+          #9a3412
+        );
+
+      color: #fff;
+
+      box-shadow: 0 4px 0 #431407;
+    }
+
+    .btn-restart {
+      background:
+        linear-gradient(
+          180deg,
+          #475569,
+          #334155
+        );
+
+      color: #fff;
+
+      box-shadow: 0 4px 0 #1e293b;
+    }
+
+    /* =========================
+       JSONエリア
+    ========================== */
+
+    details {
+      margin-top: 24px;
+
+      border-top: 2px dashed #334155;
+
+      padding-top: 14px;
+    }
+
+    summary {
+      cursor: pointer;
+
+      font-size: .8rem;
+
+      color: #94a3b8;
+
+      font-weight: 800;
+    }
+
+    textarea {
+      width: 100%;
+
+      height: 110px;
+
+      margin-top: 12px;
+
+      border: 2px solid #334155;
+
+      border-radius: 12px;
+
+      padding: 10px;
+
+      font-size: .8rem;
+
+      box-sizing: border-box;
+
+      resize: vertical;
+
+      outline: none;
+
+      background: #0b0f19;
+      color: #cbd5e1;
+    }
+
+    textarea:focus {
+      border-color: #ef4444;
+    }
+
+    /* =========================
+       正解時の舞い上がり演出（血飛沫・凶器）
+    ========================== */
+
+    .sparkle {
+      position: fixed;
+
+      pointer-events: none;
+
+      z-index: 99;
+
+      font-size: 24px;
+
+      animation: sparkleAnimation 1.2s ease-out forwards;
+    }
+
+    @keyframes sparkleAnimation {
+      0% {
+        transform:
+          translate(0,0)
+          scale(.4)
+          rotate(0);
+
+        opacity: 0;
+      }
+
+      20% {
+        opacity: 1;
+      }
+
+      100% {
+        transform:
+          translate(
+            var(--x),
+            var(--y)
+          )
+          scale(1.4)
+          rotate(180deg);
+
+        opacity: 0;
+      }
+    }
+
+    /* =========================
+       不正解時の揺れ（恐怖の衝撃）
+    ========================== */
+
+    .shake {
+      animation: shake .45s ease;
+    }
+
+    @keyframes shake {
+      0%,100% {
+        transform: translateX(0);
+      }
+
+      20% {
+        transform: translateX(-8px);
+      }
+
+      40% {
+        transform: translateX(8px);
+      }
+
+      60% {
+        transform: translateX(-6px);
+      }
+
+      80% {
+        transform: translateX(6px);
+      }
+    }
+
+    /* =========================
+       スマホ対応
+    ========================== */
+
+    @media (max-width: 520px) {
+
+      body {
+        padding: 8px;
+      }
+
+      .container {
+        padding: 14px;
+
+        border-radius: 20px;
+      }
+
+      .header h1 {
+        font-size: .92rem;
+      }
+
+      .subtitle {
+        font-size: .65rem;
+      }
+
+      .island-icon {
+        width: 44px;
+        height: 44px;
+
+        font-size: 22px;
+      }
+
+      .status-badge {
+        font-size: .62rem;
+        padding: 5px 7px;
+      }
+
+      .story-text {
+        font-size: .9rem;
+      }
+
+      .nav-buttons {
+        flex-direction: column;
+      }
+
+      .nav-btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- クリスタル・レイクの湖底から立ち上る泡・血痕 -->
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+  <div class="container">
+
+    <!-- =========================
+         ヘッダー
+    ========================== -->
+
+    <div class="header">
+
+      <div class="logo-area">
+
+        <div class="island-icon">
+          🏕️
+        </div>
+
+        <div>
+          <h1>
+            13日の金曜日
+            <br>
+            クリスタル・レイクの記録簿
+          </h1>
+
+          <div class="subtitle">
+            〜 呪われたキャンプ場の惨劇から生還せよ 〜
+          </div>
+        </div>
+
+      </div>
+
+      <span
+        class="status-badge"
+        id="status-tag"
+      >
+        🩸 探索中
+      </span>
+
+    </div>
+
+    <!-- =========================
+         探索ゲージ
+    ========================== -->
+
+    <div class="explore-bar">
+
+      <div class="explore-info">
+
+        <span>
+          🌲 生存進行度
+        </span>
+
+        <span id="progress-text">
+          0%
+        </span>
+
+      </div>
+
+      <div class="progress-track">
+        <div
+          class="progress-fill"
+          id="progress-fill"
+        ></div>
+      </div>
+
+    </div>
+
+    <!-- =========================
+         クイズエリア
+    ========================== -->
+
+    <div id="quiz-area">
+
+      <div class="card">
+
+        <div
+          class="question-label"
+          id="q-number"
+        >
+          🩸 チャプター // 01
+        </div>
+
+        <p
+          class="story-text"
+          id="story-display"
+        >
+          読み込み中...
+        </p>
+
+      </div>
+
+      <div class="guide">
+
+        <div class="guide-face">
+          ⚠️
+        </div>
+
+        <div>
+          生き延びるためには、日誌に正確な記録を刻まねばならない。
+          <br>
+          正しい仕訳（Journal entry）を導き出せ…！
+        </div>
+
+      </div>
+
+      <!-- 借方（Debit）・貸方（Credit） -->
+
+      <div class="split-container">
+
+        <div class="side-column">
+
+          <div class="side-title">
+            🩸 借方（Debit）
+          </div>
+
+          <div id="debit-rows"></div>
+
+          <button
+            type="button"
+            class="btn-add"
+            onclick="addRow('debit')"
+          >
+            ＋ もう1行追加する
+          </button>
+
+        </div>
+
+        <div class="side-column credit">
+
+          <div class="side-title">
+            🪓 貸方（Credit）
+          </div>
+
+          <div id="credit-rows"></div>
+
+          <button
+            type="button"
+            class="btn-add"
+            onclick="addRow('credit')"
+          >
+            ＋ もう1行追加する
+          </button>
+
+        </div>
+
+      </div>
+
+      <button
+        type="button"
+        class="btn-submit"
+        id="submit-btn"
+        onclick="checkAnswer()"
+      >
+        🩸 記録を確定して生き残る
+      </button>
+
+      <div
+        id="result-display"
+        class="result-box"
+      ></div>
+
+      <div class="nav-buttons">
+
+        <button
+          type="button"
+          class="nav-btn"
+          onclick="prevQuestion()"
+        >
+          🌲 前の現場へ
+        </button>
+
+        <button
+          type="button"
+          class="nav-btn"
+          id="next-btn"
+          onclick="nextQuestion()"
+        >
+          次の夜へ 🪓
+        </button>
+
+      </div>
+
+    </div>
+
+    <!-- =========================
+         完了画面
+    ========================== -->
+
+    <div
+      id="clear-area"
+      class="clear-card card"
+    >
+
+      <div class="treasure">
+        🌅🌲
+      </div>
+
+      <h2 style="color:#ef4444; margin-top:12px;">
+        夜明けの湖畔に生還した
+      </h2>
+
+      <div id="complete-badge-area"></div>
+
+      <p
+        id="score-text"
+        style="
+          line-height:1.8;
+          color:var(--text-soft);
+        "
+      ></p>
+
+      <div id="review-btn-area"></div>
+
+      <button
+        type="button"
+        class="btn-restart"
+        onclick="startFreshQuiz()"
+      >
+        🏕️ もう一度、悪夢の金曜日をやり直す
+      </button>
+
+    </div>
+
+    <!-- =========================
+         JSON読み込み
+    ========================== -->
+
+    <details>
+
+      <summary>
+        📁 外部の事件調書（JSON）を読み込む
+      </summary>
+
+      <textarea
+        id="json-input"
+        placeholder="JSONコードを貼り付けてください"
+      ></textarea>
+
+      <button
+        type="button"
+        class="btn-submit"
+        style="
+          background:linear-gradient(
+            180deg,
+            #991b1b,
+            #7f1d1d
+          );
+          box-shadow:0 5px 0 #450a0a;
+          margin-top:8px;
+        "
+        onclick="loadCustomData()"
+      >
+        🗝️ 調書データを読み込む
+      </button>
+
+    </details>
+
+  </div>
+
+
+<script>
+
+/* =========================================================
+   13日の金曜日・クリスタルレイク編
+   簿記事件記録データ
+========================================================= */
+
+const defaultData = [
+
+  {
+    "story":
+      "閉鎖されていたキャンプ場「クリスタル・レイク」を再建するため、指導員の代表スティーブが私財500,000円を元入れし、運営資金の現金として準備した。",
+    "debit": [
+      {
+        "account": "現金",
+        "amount": 500000
+      }
+    ],
+    "credit": [
+      {
+        "account": "資本金",
+        "amount": 500000
+      }
+    ],
+    "explanation":
+      "手元の現金（資産）が増加したため借方に記入します。事業の元手として出資された資金は資本金（純資産）の増加となるため、貸方に記帳します。"
+  },
+
+  {
+    "story":
+      "キャンプ場本部のロッジとして使用する山小屋の当月分家賃70,000円を、現金で地主に支払った。森の奥から不気味な視線を感じる…。",
+    "debit": [
+      {
+        "account": "支払家賃",
+        "amount": 70000
+      }
+    ],
+    "credit": [
+      {
+        "account": "現金",
+        "amount": 70000
+      }
+    ],
+    "explanation":
+      "支払家賃は費用の発生であるため借方に記帳します。支払いに伴い現金（資産）が減少するため、貸方に現金を記帳します。"
+  },
+
+  {
+    "story":
+      "嵐に備えて湖畔の敷地を整地・見回るための巡回用バギー（備品）200,000円を購入し、代金は普通預金口座から支払った。",
+    "debit": [
+      {
+        "account": "備品",
+        "amount": 200000
+      }
+    ],
+    "credit": [
+      {
+        "account": "普通預金",
+        "amount": 200000
+      }
+    ],
+    "explanation":
+      "巡回用バギーなどの機材は備品（資産）の増加となり借方に記帳します。口座から引き落とされたため普通預金（資産）の減少として貸方に記帳します。"
+  },
+
+  {
+    "story":
+      "キャンプファイヤーと自炊のために必要な非常用食料・物資90,000円分を地元の商店から仕入れた。代金は後日支払うツケ（掛け）とした。",
+    "debit": [
+      {
+        "account": "仕入",
+        "amount": 90000
+      }
+    ],
+    "credit": [
+      {
+        "account": "買掛金",
+        "amount": 90000
+      }
+    ],
+    "explanation":
+      "物資・商品の購入は仕入（費用の発生）として借方に記帳します。後日支払う義務が生じるため、負債の勘定である買掛金を貸方に記帳します。"
+  },
+
+  {
+    "story":
+      "到着した先行の宿泊客グループへ、ロッジの宿泊プラン・キャンプ用品一式140,000円を販売した。代金は後日回収する掛けとした。",
+    "debit": [
+      {
+        "account": "売掛金",
+        "amount": 140000
+      }
+    ],
+    "credit": [
+      {
+        "account": "売上",
+        "amount": 140000
+      }
+    ],
+    "explanation":
+      "後から宿泊代金を受け取る権利を得たため、資産の勘定である売掛金を借方に記帳します。売上（収益の発生）を貸方に記帳します。"
+  },
+
+  {
+    "story":
+      "先月受け入れたツアー客に対する売掛金60,000円が、キャンプ場名義の当座預金口座に振り込まれて回収された。",
+    "debit": [
+      {
+        "account": "当座預金",
+        "amount": 60000
+      }
+    ],
+    "credit": [
+      {
+        "account": "売掛金",
+        "amount": 60000
+      }
+    ],
+    "explanation":
+      "当座預金という資産が増加したため借方に記帳します。代金の回収に伴い、売掛金という権利（資産）が減少するため貸方に記帳します。"
+  },
+
+  {
+    "story":
+      "商店に対する物資の買掛金50,000円を決済するため、取引銀行の当座預金から引き落とされる小切手を振り出して支払った。",
+    "debit": [
+      {
+        "account": "買掛金",
+        "amount": 50000
+      }
+    ],
+    "credit": [
+      {
+        "account": "当座預金",
+        "amount": 50000
+      }
+    ],
+    "explanation":
+      "買掛金という義務（負債）が消滅するため借方に記帳します。小切手の振出により当座預金（資産）が減少するため貸方に記帳します。"
+  },
+
+  {
+    "story":
+      "近隣の林業関係者から、嵐で倒れた大木の撤去作業を手伝った礼として、現金30,000円の作業手数料を受け取った。",
+    "debit": [
+      {
+        "account": "現金",
+        "amount": 30000
+      }
+    ],
+    "credit": [
+      {
+        "account": "受取手数料",
+        "amount": 30000
+      }
+    ],
+    "explanation":
+      "手元に現金（資産）が入ってきたため借方に記入します。作業の対価として得た手数料は受取手数料（収益の発生）として貸方に記帳します。"
+  },
+
+  {
+    "story":
+      "ロッジの金庫に保管していた手元の現金120,000円が盗難や紛失に遭うのを防ぐため、町の銀行の普通預金口座へ預け入れた。",
+    "debit": [
+      {
+        "account": "普通預金",
+        "amount": 120000
+      }
+    ],
+    "credit": [
+      {
+        "account": "現金",
+        "amount": 120000
+      }
+    ],
+    "explanation":
+      "預け入れにより普通預金（資産）が増加するため借方に記入します。手元の現金（資産）が減少するため貸方に現金を記帳します。"
+  },
+
+  {
+    "story":
+      "キャンプ場周辺の安全パトロールを地元の警備員へ委託し、その緊急手配料として現金10,000円を手渡しで支払った。",
+    "debit": [
+      {
+        "account": "支払手数料",
+        "amount": 10000
+      }
+    ],
+    "credit": [
+      {
+        "account": "現金",
+        "amount": 10000
+      }
+    ],
+    "explanation":
+      "手数料の支払いは支払手数料（費用の発生）として借方に記帳します。現金（資産）の減少を貸方に記帳します。"
+  }
+
+];
+/* =========================================================
+   状態管理（State Management）
+========================================================= */
+
+let baseQuestions = [];
+let currentQuestions = [];
+let currentIndex = 0;
+let correctCount = 0;
+let wrongList = [];
+let answeredSet = new Set();
+let isReviewMode = false;
+
+/* =========================================================
+   初期化（Initialization）
+========================================================= */
+
+function init() {
+  const saved = localStorage.getItem("friday13_crystal_boki_data");
+
+  if (saved) {
+    try {
+      baseQuestions = JSON.parse(saved);
+    } catch (e) {
+      baseQuestions = defaultData;
+    }
+  } else {
+    baseQuestions = defaultData;
+  }
+
+  const savedIdx = localStorage.getItem("friday13_current_idx");
+  const savedCorrect = localStorage.getItem("friday13_correct_cnt");
+  const savedWrongs = localStorage.getItem("friday13_wrong_list");
+  const savedReview = localStorage.getItem("friday13_is_review");
+
+  isReviewMode = savedReview === "true";
+  wrongList = savedWrongs ? JSON.parse(savedWrongs) : [];
+  currentQuestions = isReviewMode ? [...wrongList] : [...baseQuestions];
+  correctCount = savedCorrect ? parseInt(savedCorrect, 10) : 0;
+  currentIndex = savedIdx ? parseInt(savedIdx, 10) : 0;
+
+  if (currentIndex >= currentQuestions.length && currentQuestions.length > 0) {
+    showClearScreen();
+  } else {
+    document.getElementById("quiz-area").style.display = "block";
+    document.getElementById("clear-area").style.display = "none";
+    loadQuestion(currentIndex);
+  }
+
+  // キーボードショートカット（左右キーで前後のチャプターへ移動）
+  window.addEventListener("keydown", (e) => {
+    // 入力欄にフォーカス中は左右移動を無効化
+    if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
+    if (e.key === "ArrowLeft") {
+      prevQuestion();
+    } else if (e.key === "ArrowRight") {
+      nextQuestion();
+    }
+  });
+}
+
+/* =========================================================
+   行生成（Row Creation）
+========================================================= */
+
+function createRowHTML(account = "", amount = "") {
+  const div = document.createElement("div");
+  div.className = "entry-row";
+
+  div.innerHTML = `
+    <input
+      type="text"
+      placeholder="勘定科目"
+      value="${account}"
+      lang="ja"
+    >
+    <input
+      type="number"
+      placeholder="金額"
+      value="${amount}"
+    >
+    <button
+      type="button"
+      class="btn-remove"
+      onclick="removeRow(this)"
+      title="行を削除"
+    >
+      ✕
+    </button>
+  `;
+
+  return div;
+}
+
+/* =========================================================
+   行追加（Add Row）
+========================================================= */
+
+function addRow(side) {
+  document
+    .getElementById(`${side}-rows`)
+    .appendChild(createRowHTML("", ""));
+}
+
+/* =========================================================
+   行削除（Remove Row）
+========================================================= */
+
+function removeRow(btn) {
+  const row = btn.closest(".entry-row");
+
+  if (row.parentElement.children.length > 1) {
+    row.remove();
+  } else {
+    alert("⚠️ 最低1行の記録（仕訳）は残さねばならない…！");
+  }
+}
+
+/* =========================================================
+   問題読み込み（Load Question）
+========================================================= */
+
+function loadQuestion(index) {
+  if (index < 0 || index >= currentQuestions.length) {
+    return;
+  }
+
+  currentIndex = index;
+
+  localStorage.setItem("friday13_current_idx", currentIndex);
+  localStorage.setItem("friday13_correct_cnt", correctCount);
+  localStorage.setItem("friday13_wrong_list", JSON.stringify(wrongList));
+  localStorage.setItem("friday13_is_review", isReviewMode);
+
+  const statusTag = document.getElementById("status-tag");
+
+  if (isReviewMode) {
+    statusTag.textContent = "🔄 惨劇の追体験（復習）";
+    statusTag.className = "status-badge review";
+  } else {
+    statusTag.textContent = "🩸 探索中";
+    statusTag.className = "status-badge";
+  }
+
+  const modePrefix = isReviewMode ? "🔄 復習の夜" : "🩸 チャプター";
+
+  document.getElementById("q-number").textContent =
+    `${modePrefix} // ${String(index + 1).padStart(2, "0")} / ${currentQuestions.length}`;
+
+  document.getElementById("story-display").textContent =
+    currentQuestions[index].story;
+
+  document.getElementById("debit-rows").innerHTML = "";
+  document.getElementById("credit-rows").innerHTML = "";
+
+  addRow("debit");
+  addRow("credit");
+
+  const res = document.getElementById("result-display");
+  res.style.display = "none";
+  res.className = "result-box";
+
+  document.getElementById("submit-btn").style.display = "block";
+
+  const nextBtn = document.getElementById("next-btn");
+  nextBtn.textContent =
+    currentIndex === currentQuestions.length - 1
+      ? "夜明けの結末を見る 🌅"
+      : "次の夜へ 🪓";
+
+  updateProgress();
+
+  // 読み込み時、借方の最初の入力枠へ自動フォーカス
+  setTimeout(() => {
+    const firstInput = document.querySelector("#debit-rows input[type='text']");
+    if (firstInput) firstInput.focus();
+  }, 50);
+}
+
+/* =========================================================
+   入力データ取得（Get Entries）
+========================================================= */
+
+function getEntries(side) {
+  const rows = document.getElementById(`${side}-rows`).children;
+  const entries = [];
+
+  for (let row of rows) {
+    const inputs = row.querySelectorAll("input");
+    const account = inputs[0].value.trim();
+    const amount = parseInt(inputs[1].value, 10);
+
+    if (account && !isNaN(amount)) {
+      entries.push({
+        account,
+        amount
+      });
+    }
+  }
+
+  return entries;
+}
+
+/* =========================================================
+   正解判定（Answer Verification）
+========================================================= */
+
+function checkAnswer() {
+  const q = currentQuestions[currentIndex];
+
+  const userDebit = getEntries("debit");
+  const userCredit = getEntries("credit");
+
+  const normalizeData = (sideData) => {
+    if (!sideData) return [];
+    if (Array.isArray(sideData)) return sideData;
+    return [sideData];
+  };
+
+  const correctDebit = normalizeData(q.debit);
+  const correctCredit = normalizeData(q.credit);
+
+  // 順序不同・金額（Amount）と勘定科目（Account）の一致判定
+  const matchSide = (u, c) => {
+    if (u.length !== c.length) return false;
+
+    const sU = [...u].sort(
+      (a, b) => a.account.localeCompare(b.account) || a.amount - b.amount
+    );
+    const sC = [...c].sort(
+      (a, b) => a.account.localeCompare(b.account) || a.amount - b.amount
+    );
+
+    return sU.every(
+      (v, i) => v.account === sC[i].account && v.amount === sC[i].amount
+    );
+  };
+
+  const isOk =
+    matchSide(userDebit, correctDebit) &&
+    matchSide(userCredit, correctCredit);
+
+  const res = document.getElementById("result-display");
+  res.style.display = "block";
+
+  if (isOk) {
+    /* =====================
+       正解演出（生還・成功）
+    ====================== */
+    res.className = "result-box correct";
+
+    res.innerHTML = `
+      <strong>🩸 生還！ 正しい記録を刻んだ…！</strong>
+      <br>
+      暗闇の向こうで潜んでいた影が、静かに霧の中へと後退した。
+      <br><br>
+      【事件調書の記録】
+      <br>
+      ${q.explanation}
+    `;
+
+    createSparkles();
+
+    if (!answeredSet.has(currentIndex)) {
+      correctCount++;
+
+      if (isReviewMode) {
+        wrongList = wrongList.filter(item => item.story !== q.story);
+      }
+
+      answeredSet.add(currentIndex);
+    }
+
+  } else {
+    /* =====================
+       不正解演出（恐怖の衝撃・画面揺れ）
+    ====================== */
+    res.className = "result-box wrong";
+
+    const dStr = correctDebit
+      .map(d => `（${d.account}: ${d.amount.toLocaleString()}円）`)
+      .join(" ");
+
+    const cStr = correctCredit
+      .map(c => `（${c.account}: ${c.amount.toLocaleString()}円）`)
+      .join(" ");
+
+    res.innerHTML = `
+      <strong>🪓 悲鳴……！ 仕訳に重大な誤りがある！</strong>
+      <br>
+      背後から重い足音が近づいてくる……正しい事実を把握せよ！
+      <br><br>
+      【正しい記録（仕訳）】
+      <br>
+      🩸 借方（Debit）: ${dStr}
+      <br>
+      🪓 貸方（Credit）: ${cStr}
+      <br><br>
+      【解説】
+      <br>
+      ${q.explanation}
+    `;
+
+    // 画面全体を揺らす恐怖アニメーション（Shake Animation）
+    document.getElementById("quiz-area").classList.remove("shake");
+    void document.getElementById("quiz-area").offsetWidth;
+    document.getElementById("quiz-area").classList.add("shake");
+
+    if (!answeredSet.has(currentIndex)) {
+      if (!wrongList.some(item => item.story === q.story)) {
+        wrongList.push(q);
+      }
+      answeredSet.add(currentIndex);
+    }
+  }
+
+  localStorage.setItem("friday13_correct_cnt", correctCount);
+  localStorage.setItem("friday13_wrong_list", JSON.stringify(wrongList));
+
+  updateProgress();
+}
+
+/* =========================================================
+   演出エフェクト（血飛沫・凶器・霧の粒子）
+========================================================= */
+
+function createSparkles() {
+  const symbols = ["🩸", "🪓", "🌲", "⚡", "🕯️"];
+
+  for (let i = 0; i < 18; i++) {
+    const sparkle = document.createElement("div");
+    sparkle.className = "sparkle";
+    sparkle.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+
+    sparkle.style.left = (40 + Math.random() * 20) + "%";
+    sparkle.style.top = (35 + Math.random() * 25) + "%";
+
+    sparkle.style.setProperty("--x", (Math.random() * 260 - 130) + "px");
+    sparkle.style.setProperty("--y", (Math.random() * -220 - 40) + "px");
+
+    document.body.appendChild(sparkle);
+
+    setTimeout(() => sparkle.remove(), 1300);
+  }
+}
+
+/* =========================================================
+   前の問題（Previous Question）
+========================================================= */
+
+function prevQuestion() {
+  if (currentIndex > 0) {
+    loadQuestion(currentIndex - 1);
+  }
+}
+
+/* =========================================================
+   次の問題（Next Question）
+========================================================= */
+
+function nextQuestion() {
+  if (currentIndex < currentQuestions.length - 1) {
+    loadQuestion(currentIndex + 1);
+  } else {
+    showClearScreen();
+  }
+}
+
+/* =========================================================
+   進行度ゲージ更新（Progress Bar Calculation）
+========================================================= */
+
+function updateProgress() {
+  if (currentQuestions.length === 0) return;
+
+  // 百分率（Percentage）計算
+  const percent = Math.round((currentIndex / currentQuestions.length) * 100);
+
+  document.getElementById("progress-fill").style.width = percent + "%";
+  document.getElementById("progress-text").textContent = percent + "%";
+}
+
+/* =========================================================
+   完了画面（Clear Screen）
+========================================================= */
+
+function showClearScreen() {
+  document.getElementById("quiz-area").style.display = "none";
+
+  const clearArea = document.getElementById("clear-area");
+  clearArea.style.display = "block";
+
+  const total = currentQuestions.length;
+  const badgeArea = document.getElementById("complete-badge-area");
+  const scoreText = document.getElementById("score-text");
+  const reviewBtnArea = document.getElementById("review-btn-area");
+
+  badgeArea.innerHTML = "";
+  reviewBtnArea.innerHTML = "";
+
+  if (wrongList.length === 0) {
+    localStorage.setItem("friday13_master_completed", "true");
+
+    badgeArea.innerHTML = `
+      <div class="badge-complete">
+        🏆 完全生還・クリスタルレイク踏破達成
+      </div>
+    `;
+
+    scoreText.innerHTML = `
+      🌅 朝の光が霧深き湖面を照らし出した……！
+      <br>
+      <strong>${total}問中 ${correctCount}問 生還（全問正解）</strong>
+      <br><br>
+      すべての仕訳を完璧に導き出し、あなたは悪夢の一夜を生き延びた。
+      <br>
+      だが、静まり返った湖底の奥底には、今も何かが眠っている……。
+    `;
+
+    createSparkles();
+
+  } else {
+    scoreText.innerHTML = `
+      🌲 探索が終了した。しかし、まだ惨劇の痕跡が残されている……。
+      <br>
+      <strong>${total}問中 ${correctCount}問 生還</strong>
+      <br><br>
+      未解決の過ちが <strong>${wrongList.length}問</strong> あります。
+      <br>
+      霧が晴れる前に、もう一度調書を洗い直そう。
+    `;
+
+    const revBtn = document.createElement("button");
+    revBtn.className = "btn-review";
+    revBtn.textContent = `🔄 誤った記録だけを再調査する（${wrongList.length}問）`;
+    revBtn.onclick = startReviewMode;
+
+    reviewBtnArea.appendChild(revBtn);
+  }
+
+  localStorage.setItem("friday13_current_idx", currentQuestions.length);
+}
+
+/* =========================================================
+   復習モード開始（Review Mode）
+========================================================= */
+
+function startReviewMode() {
+  isReviewMode = true;
+  currentQuestions = [...wrongList];
+  currentIndex = 0;
+  correctCount = 0;
+  answeredSet.clear();
+
+  document.getElementById("quiz-area").style.display = "block";
+  document.getElementById("clear-area").style.display = "none";
+
+  loadQuestion(0);
+}
+
+/* =========================================================
+   最初から再開（Restart Fresh Quiz）
+========================================================= */
+
+function startFreshQuiz() {
+  clearSavedProgress();
+
+  isReviewMode = false;
+  currentQuestions = [...baseQuestions];
+  wrongList = [];
+  currentIndex = 0;
+  correctCount = 0;
+  answeredSet.clear();
+
+  document.getElementById("quiz-area").style.display = "block";
+  document.getElementById("clear-area").style.display = "none";
+
+  loadQuestion(0);
+}
+
+/* =========================================================
+   保存データ削除（Clear Progress）
+========================================================= */
+
+function clearSavedProgress() {
+  localStorage.removeItem("friday13_current_idx");
+  localStorage.removeItem("friday13_correct_cnt");
+  localStorage.removeItem("friday13_wrong_list");
+  localStorage.removeItem("friday13_is_review");
+}
+
+/* =========================================================
+   外部JSON読み込み（Load Custom Data）
+========================================================= */
+
+function loadCustomData() {
+  const input = document.getElementById("json-input").value;
+
+  try {
+    const data = JSON.parse(input);
+
+    if (!Array.isArray(data) || data.length === 0) {
+      throw new Error();
+    }
+
+    baseQuestions = data;
+    localStorage.setItem("friday13_crystal_boki_data", JSON.stringify(data));
+    clearSavedProgress();
+    localStorage.removeItem("friday13_master_completed");
+
+    alert("🌲 新たな事件調書（問題データ）をロードしました！");
+    startFreshQuiz();
+
+  } catch (e) {
+    alert("⚠️ JSONデータの書式（フォーマット）が正しくありません。");
+  }
+}
+
+/* =========================================================
+   画面ロード時に起動
+========================================================= */
+
+window.onload = init;
+
+</script>
+
+</body>
+</html>
